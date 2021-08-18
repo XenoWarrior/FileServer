@@ -1,6 +1,10 @@
 # FileServer
 Simple file server for ShareX with web interface
 
+# Supports
+* Upload via ShareX
+* Upload via iOS/iPadOS Shortcut (TODO: Share how-to)
+
 # Setup
 1) `npm install`
 2) `npm run build` or `npm run serve` (client-side)
