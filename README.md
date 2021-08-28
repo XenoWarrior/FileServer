@@ -2,15 +2,39 @@
 Simple file server for ShareX with web interface
 
 # Setup
-1) `npm install`
-2) `npm run build` or `npm run serve` (client-side)
-3) `npm run start` (server)
+Clone the respository using:
+```
+git clone https://github.com/XenoWarrior/FileServer.git
+```
 
-# Todo:
-* Split server / client to separate deps.
+Install the packages:
+```
+npm install
+```
 
-# Environment Configuration
-Create these file locally, don't commit them!
+If you're deploying this to a server, you'll need to build the client-side app:
+```
+npm run build
+```
+For a developement environment, use:
+```
+npm run serve
+```
+The `serve` command starts the webpack dev server on your local machine. Defaults to port 9000.
+
+In both cases, production or development, you should run the back-end:
+```
+npm run start
+```
+
+When deploying to a public server, consider using a Docker container. Use your webserver to proxy all other request URIs to your docker container internally. 
+This can be done in nginx like so:
+```
+
+```
+
+# TODO
+* Include a docker-compose file.
 
 # .env
 ### Server Configuration
