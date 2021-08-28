@@ -1,5 +1,7 @@
 const mysql = require("mysql");
 const { v4: uuid } = require("uuid");
+const constants = require("./constants");
+const level = process.env.LOG_LEVEL;
 
 /**
  * Database Manager
@@ -15,6 +17,8 @@ class DatabaseManager {
      * @param {string} database | Database to use
      */
     constructor(hostname, username, password, database) {
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: Initialised") : null;
+        level >= constants.LOG_LEVEL.TRACE ? console.trace("[TRACE]") : null;
         this.instance = uuid();
 
         this.pool = mysql.createPool({
@@ -71,6 +75,7 @@ class DatabaseManager {
      *      -- WHERE condition OR condition
      */
     async select(options) {
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: select called with options:", options) : null;
         let columns = options.columns,
             table = options.from,
             where = options.where || undefined,
@@ -133,7 +138,9 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement} ${sortStatement}`, tableParams, function (error, results, fields) {
+                let queryString = `SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement} ${sortStatement}`;
+                level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: select final statement:", queryString) : null;
+                connection.query(queryString, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }
