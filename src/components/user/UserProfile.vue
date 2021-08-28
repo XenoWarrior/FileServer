@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import FileList from "../lists/FileList.vue";
-
 export default {
     name: "user-profile",
     methods: {

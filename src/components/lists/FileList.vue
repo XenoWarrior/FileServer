@@ -11,7 +11,7 @@
                         </span>
                     </template>
                 </v-btn>
-                <!-- <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
+                <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
                     <v-icon>mdi-download</v-icon>
                 </v-btn>
                 <v-btn @click="fileOperation('edit')" v-if="selected.length > 0" icon color="green">
@@ -19,7 +19,7 @@
                 </v-btn>
                 <v-btn @click="fileOperation('delete')" v-if="selected.length > 0" icon color="red">
                     <v-icon>mdi-delete</v-icon>
-                </v-btn> -->
+                </v-btn>
             </v-subheader>
 
             <v-row v-if="error">

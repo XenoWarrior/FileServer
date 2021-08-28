@@ -24,7 +24,7 @@
                     </v-list-item>
                 </v-list>
                 <v-divider></v-divider>
-                <v-list three-line subheader>
+                <!-- <v-list three-line subheader>
                     <v-subheader>Upload Settings</v-subheader>
                     <v-list-item>
                         <v-list-item-action>
@@ -35,7 +35,7 @@
                             <v-list-item-subtitle>Make these uploads private, anyone accessing the files will require permission or token link. You can always change this in the file settings.</v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
-                </v-list>
+                </v-list> -->
             </v-card>
         </v-dialog>
     </v-row>
@@ -50,8 +50,7 @@ export default {
     },
     data() {
         return {
-            dialog: false,
-            private: false
+            dialog: false
         };
     }
 };
