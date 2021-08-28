@@ -23,7 +23,7 @@ class FileGet extends RouteBase {
      * @param {object} res | Handle responses
      */
     async uploadFile(req, res) {
-        if (req.headers.hasOwnProperty("authorization") && FileRegEx.exec(req.headers.authorization)) {
+        if ((req.headers.hasOwnProperty("authorization") || req.headers.hasOwnProperty("Authorization")) && FileRegEx.exec(req.headers.authorization)) {
             let incomingToken = req.headers.authorization;
 
             let token = await database.select({
@@ -42,7 +42,7 @@ class FileGet extends RouteBase {
                     });
                 });
 
-            if (token && !token.token_revoked) {
+            if (token.hasOwnProperty("token_user") && !token.token_revoked) {
                 req.pipe(req.busboy);
                 req.busboy.on('file', function (fieldname, file, filename) {
                     try {
@@ -109,13 +109,13 @@ class FileGet extends RouteBase {
             } else {
                 res.status(401).send({
                     status: 401,
-                    message: `Token has been revoked.`
+                    message: `Authorization token is invalid.`
                 });
             }
         } else {
             res.status(401).send({
                 status: 401,
-                message: `Invalid token provided.`
+                message: `Please provide an Authorization token.`
             });
         }
     }

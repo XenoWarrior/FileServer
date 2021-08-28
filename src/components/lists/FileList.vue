@@ -1,94 +1,92 @@
 <template>
-    <v-container fluid>
-        <v-row cols="12" dense>
-            <v-row sm="6">
-                <v-subheader>
-                    My Files
-                    <v-btn :loading="loading" :disabled="loading" icon color="green" @click="loader = 'loading'; getFiles()">
-                        <v-icon>mdi-cached</v-icon>
-                        <template v-slot:loader>
-                            <span class="custom-loader">
-                                <v-icon light>cached</v-icon>
-                            </span>
-                        </template>
-                    </v-btn>
-                    <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
-                        <v-icon>mdi-download</v-icon>
-                    </v-btn>
-                    <v-btn @click="fileOperation('edit')" v-if="selected.length > 0" icon color="green">
-                        <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                    <v-btn @click="fileOperation('delete')" v-if="selected.length > 0" icon color="red">
-                        <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                </v-subheader>
-            </v-row>
-        </v-row>
-
-        <v-row v-if="error">
-            <v-col cols="12" sm="12">
-                <v-alert dismissible type="error">{{ error }}</v-alert>
-            </v-col>
-        </v-row>
-
-        <v-data-table
-            :loading="loading"
-            :headers="headers"
-            :items="this.$store.getters.myFiles"
-            :show-select="!isMobile"
-            v-model="selected"
-            loading-text="Please wait..."
-            v-resize="onResize"
-        >
-            <template v-slot:item.upload_filename="{ item }">
-                <v-btn v-on:click="viewFile(item)" text small>
-                    <v-icon left dark>mdi-{{ getMimeIcon(item.upload_mime )}}</v-icon>
-                    {{ item.upload_filename }}
+    <v-container>
+        <v-layout column>
+            <v-subheader>
+                My Files
+                <v-btn :loading="loading" :disabled="loading" icon color="green" @click="loader = 'loading'; getFiles()">
+                    <v-icon>mdi-cached</v-icon>
+                    <template v-slot:loader>
+                        <span class="custom-loader">
+                            <v-icon light>cached</v-icon>
+                        </span>
+                    </template>
                 </v-btn>
-            </template>
+                <!-- <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
+                    <v-icon>mdi-download</v-icon>
+                </v-btn>
+                <v-btn @click="fileOperation('edit')" v-if="selected.length > 0" icon color="green">
+                    <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn @click="fileOperation('delete')" v-if="selected.length > 0" icon color="red">
+                    <v-icon>mdi-delete</v-icon>
+                </v-btn> -->
+            </v-subheader>
 
-            <template v-slot:item.upload_date="{ item }">
-                <span>{{ moment(item.upload_date).fromNow() }}</span>
-            </template>
+            <v-row v-if="error">
+                <v-col cols="12" sm="12">
+                    <v-alert dismissible type="error">{{ error }}</v-alert>
+                </v-col>
+            </v-row>
 
-            <template v-slot:item.actions="{ item }">
-                <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                        <v-icon v-on="on" medium class="mr-2" @click="fileOperation('copy-link', item)">mdi-content-copy</v-icon>
-                    </template>
-                    <span>Copy Link</span>
-                </v-tooltip>
+            <v-data-table
+                :loading="loading"
+                :headers="headers"
+                :items="this.$store.getters.myFiles"
+                :show-select="!isMobile"
+                v-model="selected"
+                loading-text="Please wait..."
+                v-resize="onResize"
+            >
+                <template v-slot:item.upload_filename="{ item }">
+                    <v-btn v-on:click="viewFile(item)" text small>
+                        <v-icon left dark>mdi-{{ getMimeIcon(item.upload_mime )}}</v-icon>
+                        {{ item.upload_filename }}
+                    </v-btn>
+                </template>
 
-                <v-snackbar color="success" v-model="copied.done">
-                    Link for "{{ copied.name }}" copied.
-                    <template v-slot:action="{ attrs }">
-                        <v-btn color="secondary" text v-bind="attrs" @click="copied.done = false; copied.name = null;">Close</v-btn>
-                    </template>
-                </v-snackbar>
+                <template v-slot:item.upload_date="{ item }">
+                    <span>{{ moment(item.upload_date).fromNow() }}</span>
+                </template>
 
-                <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                        <v-icon v-on="on" medium class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
-                    </template>
-                    <span>Download File</span>
-                </v-tooltip>
-                <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                        <v-icon v-on="on" medium class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
-                    </template>
-                    <span>Edit File Settings</span>
-                </v-tooltip>
-                <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                        <v-icon v-on="on" medium color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
-                    </template>
-                    <span>Delete File</span>
-                </v-tooltip>
-            </template>
+                <template v-slot:item.actions="{ item }">
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                            <v-icon v-on="on" medium class="mr-2" @click="fileOperation('copy-link', item)">mdi-content-copy</v-icon>
+                        </template>
+                        <span>Copy Link</span>
+                    </v-tooltip>
 
-            <v-input v-model="copyText" hidden></v-input>
-        </v-data-table>
-        <file-editor></file-editor>
+                    <v-snackbar color="success" v-model="copied.done">
+                        Link for "{{ copied.name }}" copied.
+                        <template v-slot:action="{ attrs }">
+                            <v-btn color="secondary" text v-bind="attrs" @click="copied.done = false; copied.name = null;">Close</v-btn>
+                        </template>
+                    </v-snackbar>
+
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                            <v-icon v-on="on" medium class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
+                        </template>
+                        <span>Download File</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                            <v-icon v-on="on" medium class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
+                        </template>
+                        <span>Edit File Settings</span>
+                    </v-tooltip>
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on }">
+                            <v-icon v-on="on" medium color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
+                        </template>
+                        <span>Delete File</span>
+                    </v-tooltip>
+                </template>
+
+                <v-input v-model="copyText" hidden></v-input>
+            </v-data-table>
+            <file-editor></file-editor>
+        </v-layout>
     </v-container>
 </template>
 

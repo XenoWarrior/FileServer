@@ -4,7 +4,7 @@
   "description": "",
   "author": "Ashley Scott",
   "scripts": {
-    "serve": "webpack-dev-server",
+    "serve": "webpack-dev-server --content-base src --hot --inline",
     "build": "webpack",
     "start": "node ./app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
