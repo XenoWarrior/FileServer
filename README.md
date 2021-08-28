@@ -30,6 +30,8 @@ npm run serve
 The `serve` script starts the webpack dev server on your local machine. Default port is 9000.
 The webpack dev server automatically proxies `/api/v1/*` to `localhost:3030`. You can edit this in `webpack.config.js` under the `devServer.proxy` node.
 
+Note: this service is not optimised yet. You will see a lot of warnings!
+
 ## Deployment
 After building the client-side web app, drop the output files from the `dist` folder into your webserver. 
 
