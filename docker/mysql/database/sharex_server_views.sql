@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS `sharex`;
+
+USE `sharex`;
+
 DROP TABLE IF EXISTS `views`;
 CREATE TABLE `views` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS `sharex`;
+
+USE `sharex`;
+
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` varchar(50) NOT NULL,
