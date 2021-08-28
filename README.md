@@ -33,7 +33,7 @@ The webpack dev server automatically proxies `/api/v1/*` to `localhost:3030`. Yo
 Note: this service is not optimised yet. You will see a lot of warnings!
 
 ## Deployment
-After building the client-side web app, drop the output files from the `dist` folder into your webserver. 
+After building the client-side web app, drop the output files from the `dist` folder into your webserver. Then start the server with `npm run start`.
 
 When deploying to a public server, consider using a persistent Docker container.
 Just like the webpack dev server, your configuration must proxy `/api/v1/*` to the server or you'll hit a 404 error.
