@@ -42,7 +42,7 @@ class RouteBase {
                     email: data.user_email
                 });
             } else {
-                done(null, false, { message: "Invalid password" });
+                done(null, false, { message: "Invalid credentials" });
             }
         } else {
             done(null, false, { message: "Invalid credentials" });
