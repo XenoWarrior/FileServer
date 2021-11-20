@@ -140,6 +140,7 @@ class DatabaseManager {
             if (connection) {
                 let queryString = `SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement} ${sortStatement}`;
                 level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: select final statement:", queryString) : null;
+
                 connection.query(queryString, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
@@ -164,6 +165,8 @@ class DatabaseManager {
      * @param {object} where | Conditions for the selection
      */
     async update(options) {
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: update called with options:", options) : null;
+
         let table = options.table,
             set = options.set,
             where = options.where || undefined;
@@ -208,7 +211,10 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`UPDATE ?? SET ? ${updateStatement}`, tableParams, (error, results, fields) => {
+                let queryString = `UPDATE ?? SET ? ${updateStatement}`;
+                level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: update final statement:", queryString) : null;
+
+                connection.query(queryString, tableParams, (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
@@ -227,6 +233,11 @@ class DatabaseManager {
      * @param {object} where | Conditions for the selection
      */
     async increment(table, column, where) {
+        let options = {
+            ...table, ...column, ...where
+        };
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: increment called with options:", options) : null;
+
         return new Promise(async (resolve, reject) => {
             let connection = await this.getConnection()
                 .catch((error) => {
@@ -234,7 +245,10 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`UPDATE ?? SET ${column} = ${column}+1`, [table], (error, results, fields) => {
+                let queryString = `UPDATE ?? SET ${column} = ${column}+1`;
+                level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: increment final statement:", queryString) : null;
+
+                connection.query(queryString, [table], (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
@@ -252,6 +266,11 @@ class DatabaseManager {
      * @param {object} set   | Values to insert
      */
     async insert(table, value) {
+        let options = {
+            ...table, ...value
+        };
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: insert called with options:", options) : null;
+
         return new Promise(async (resolve, reject) => {
             let connection = await this.getConnection()
                 .catch((error) => {
@@ -259,7 +278,10 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query('INSERT INTO ?? SET ?', [table, value], (error, results, fields) => {
+                let queryString = 'INSERT INTO ?? SET ?';
+                level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: insert final statement:", queryString) : null;
+
+                connection.query(queryString, [table, value], (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
@@ -277,6 +299,8 @@ class DatabaseManager {
      * @param {object} where | Conditions to be used
      */
     async delete(table, where) {
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: delete called with options:", options) : null;
+
         return new Promise(async (resolve, reject) => {
             let tableparams = [table];
             let selectStatement = '';
@@ -298,7 +322,10 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`DELETE FROM ?? ${selectStatement}`, tableparams, function (error, results, fields) {
+                let queryString = `DELETE FROM ?? ${selectStatement}`;
+                level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: delete final statement:", queryString) : null;
+
+                connection.query(queryString, tableparams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }
@@ -317,6 +344,8 @@ class DatabaseManager {
      * @param {object} keys   | Keys to be used for upsert
      */
     async upsert(table, values, keys) {
+        level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: upsert called with options:", options) : null;
+
         let keyUpdate = "";
 
         keys.forEach(k => {
@@ -332,7 +361,10 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`START TRANSACTION; INSERT INTO ?? ( ${this.connection.escape(keys)} ) VALUES ? ON DUPLICATE KEY UPDATE ${keyUpdate}; COMMIT;`, [table, values], (error, results) => {
+                let queryString = `START TRANSACTION; INSERT INTO ?? ( ${this.connection.escape(keys)} ) VALUES ? ON DUPLICATE KEY UPDATE ${keyUpdate}; COMMIT;`;
+                level >= constants.LOG_LEVEL.DEBUG ? console.log("[DEBUG] DatabaseManager: delete final statement:", queryString) : null;
+                
+                connection.query(queryString, [table, values], (error, results) => {
                     if (error) {
                         reject(error);
                     }
