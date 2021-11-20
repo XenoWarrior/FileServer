@@ -31,8 +31,6 @@ class FileGet extends RouteBase {
                 })
             }
 
-            console.log(req.body);
-
             let incomingToken = req.headers.authorization;
             let token = await database.select({
                 columns: "token_revoked, token_user",
