@@ -24,8 +24,14 @@ class FileGet extends RouteBase {
      */
     async uploadFile(req, res) {
         if ((req.headers.hasOwnProperty("authorization") || req.headers.hasOwnProperty("Authorization")) && FileRegEx.exec(req.headers.authorization)) {
-            let incomingToken = req.headers.authorization;
+            if (!req.headers["content-type"].includes("multipart/form-data")) {
+                return res.status(400).send({
+                    status: 400,
+                    message: "Bad request"
+                })
+            }
 
+            let incomingToken = req.headers.authorization;
             let token = await database.select({
                 columns: "token_revoked, token_user",
                 from: process.env.TOKEN_TABLE_V1,
@@ -43,13 +49,16 @@ class FileGet extends RouteBase {
                 });
 
             if (token.hasOwnProperty("token_user") && !token.token_revoked) {
-                req.pipe(req.busboy);
+                try {
+                    req.pipe(req.busboy);
+                } catch (e) {
+                    console.error(e);
+                }
                 req.busboy.on('file', function (fieldname, file, filename) {
                     try {
                         console.log("Uploading:", filename);
 
                         let requestId = uuid();
-
                         let fileExt = path.extname(filename);
                         let newFilename = `${requestId}${fileExt}`;
                         let filePath = `${__dirname}/public/${newFilename}`;
@@ -89,7 +98,7 @@ class FileGet extends RouteBase {
                                     console.log(error);
                                     res.status(500).send({
                                         status: 500,
-                                        message: error.message
+                                        message: "Internal server error."
                                     });
                                 });
 
@@ -102,7 +111,7 @@ class FileGet extends RouteBase {
                         console.log(error);
                         res.status(500).send({
                             status: 500,
-                            message: error.message
+                            message: "Internal server error."
                         });
                     }
                 });
