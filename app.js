@@ -31,7 +31,7 @@ app.use(busboy());
 
 // Auth/Sessions
 app.use(cookieParser());
-app.use(session({ secret: process.env.SESSION_SECRET }));
+app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
