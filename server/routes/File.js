@@ -31,6 +31,8 @@ class FileGet extends RouteBase {
                 })
             }
 
+            console.log(req.body);
+
             let incomingToken = req.headers.authorization;
             let token = await database.select({
                 columns: "token_revoked, token_user",
@@ -49,11 +51,15 @@ class FileGet extends RouteBase {
                 });
 
             if (token.hasOwnProperty("token_user") && !token.token_revoked) {
-                try {
-                    req.pipe(req.busboy);
-                } catch (e) {
-                    console.error(e);
-                }
+                req.pipe(req.busboy);
+
+                req.busboy.on('field', function (fieldname, file, filename) {
+                    res.status(501).send({
+                        status: 400,
+                        message: `Bad request.`
+                    });
+                });
+
                 req.busboy.on('file', function (fieldname, file, filename) {
                     try {
                         console.log("Uploading:", filename);
