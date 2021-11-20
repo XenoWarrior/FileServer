@@ -23,6 +23,7 @@ class FileGet extends RouteBase {
      * @param {object} res | Handle responses
      */
     async uploadFile(req, res) {
+        console.log("INCOMING REQUEST", Date.now());
         if ((req.headers.hasOwnProperty("authorization") || req.headers.hasOwnProperty("Authorization")) && FileRegEx.exec(req.headers.authorization)) {
             if (!req.headers["content-type"].includes("multipart/form-data")) {
                 return res.status(400).send({
