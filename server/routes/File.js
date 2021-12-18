@@ -138,77 +138,80 @@ class FileGet extends RouteBase {
         let fileId = req.params.id;
 
         if (FileRegEx.exec(fileId)) {
-            database.select({
+            let fileData = database.select({
                 columns: "*",
                 from: process.env.UPLOAD_TABLE_V1,
-                where: { id: fileId }
-            })
-                .then(async (r) => {
-                    if (r.length > 0) {
-                        let fileData = r[0];
-                        try {
-                            let stats = fs.statSync(fileData.upload_path);
-                            let total = stats.size;
+                where: { id: fileId },
+                options: {
+                    singleItem: true
+                }
+            });
 
-                            if (req.headers.range) {
-                                var range = req.headers.range;
-                                var parts = range.replace(/bytes=/, "").split("-");
-                                var partialStart = parts[0];
-                                var partialEnd = parts[1];
+            if (fileData) {
+                try {
+                    let stats;
 
-                                var start = parseInt(partialStart, 10);
-                                var end = partialEnd ? parseInt(partialEnd, 10) : total - 1;
-                                var chunkSize = (end - start) + 1;
-                                var readStream = fs.createReadStream(fileData.upload_path, { start: start, end: end });
-
-                                res.status(206).set({
-                                    'Connection': 'keep-alive',
-                                    "Content-Range": "bytes " + start + "-" + end + "/" + total,
-                                    "Accept-Ranges": "bytes",
-                                    "Content-Length": chunkSize,
-                                    "Content-Type": fileData.upload_mime
-                                });
-                                readStream.pipe(res);
-                            } else {
-                                let file = fs.createReadStream(fileData.upload_path)
-                                file.on('error', function () {
-                                    res.status(404).send({
-                                        status: 404,
-                                        message: "File does not exist"
-                                    });
-                                });
-
-                                file.on('open', function () {
-                                    let headers = {
-                                        'Connection': 'keep-alive',
-                                        "Content-Length": stats.size,
-                                        "Accept-Ranges": "bytes",
-                                        "Content-Type": `${fileData.upload_mime}`,
-                                        "Content-Disposition": `filename="${fileData.upload_filename}"`
-                                    };
-
-                                    res.status(200).set(headers);
-                                    file.pipe(res);
-                                });
-                            }
-                        } catch (error) {
-                            console.log(error);
-                        }
-                    }
-                    else {
-                        res.status(404).send({
+                    try {
+                        stats = fs.statSync(fileData.upload_path);
+                    } catch (e) {
+                        res.stats(404).send({
                             status: 404,
-                            message: "File does not exist"
+                            message: "File not found."
+                        });
+                        return;
+                    }
+                    let total = stats.size;
+
+                    if (req.headers.range) {
+                        var range = req.headers.range;
+                        var parts = range.replace(/bytes=/, "").split("-");
+                        var partialStart = parts[0];
+                        var partialEnd = parts[1];
+
+                        var start = parseInt(partialStart, 10);
+                        var end = partialEnd ? parseInt(partialEnd, 10) : total - 1;
+                        var chunkSize = (end - start) + 1;
+                        var readStream = fs.createReadStream(fileData.upload_path, { start: start, end: end });
+
+                        res.status(206).set({
+                            'Connection': 'keep-alive',
+                            "Content-Range": "bytes " + start + "-" + end + "/" + total,
+                            "Accept-Ranges": "bytes",
+                            "Content-Length": chunkSize,
+                            "Content-Type": fileData.upload_mime
+                        });
+                        readStream.pipe(res);
+                    } else {
+                        let file = fs.createReadStream(fileData.upload_path)
+                        file.on('error', function () {
+                            res.status(404).send({
+                                status: 404,
+                                message: "File does not exist"
+                            });
+                        });
+
+                        file.on('open', function () {
+                            let headers = {
+                                'Connection': 'keep-alive',
+                                "Content-Length": stats.size,
+                                "Accept-Ranges": "bytes",
+                                "Content-Type": `${fileData.upload_mime}`,
+                                "Content-Disposition": `filename="${fileData.upload_filename}"`
+                            };
+
+                            res.status(200).set(headers);
+                            file.pipe(res);
                         });
                     }
-                })
-                .catch((error) => {
-                    console.error(error);
-                    res.status(500).send({
-                        status: 500,
-                        message: error.message
-                    });
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                res.status(404).send({
+                    status: 404,
+                    message: "File does not exist"
                 });
+            }
         } else {
             res.status(404).send({
                 status: 404,
