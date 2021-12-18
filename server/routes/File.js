@@ -146,7 +146,7 @@ class FileGet extends RouteBase {
         }
 
         if (FileRegEx.exec(fileId)) {
-            let fileData = database.select({
+            let fileData = await database.select({
                 columns: "*",
                 from: process.env.UPLOAD_TABLE_V1,
                 where: { id: fileId },
@@ -165,6 +165,7 @@ class FileGet extends RouteBase {
                         res.status(404).send({
                             status: 404,
                             message: "File not found."
+                            e: e
                         });
                         return;
                     }
@@ -194,7 +195,7 @@ class FileGet extends RouteBase {
                         file.on('error', function () {
                             res.status(404).send({
                                 status: 404,
-                                message: "File does not exist"
+                                message: "File not found."
                             });
                         });
 
@@ -217,13 +218,13 @@ class FileGet extends RouteBase {
             } else {
                 res.status(404).send({
                     status: 404,
-                    message: "File does not exist"
+                    message: "File not found."
                 });
             }
         } else {
             res.status(404).send({
                 status: 404,
-                message: `No file found with id: ${fileId}`
+                message: `File not found.`
             });
         }
 
