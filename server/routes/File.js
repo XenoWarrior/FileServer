@@ -154,7 +154,7 @@ class FileGet extends RouteBase {
                     try {
                         stats = fs.statSync(fileData.upload_path);
                     } catch (e) {
-                        res.stats(404).send({
+                        res.status(404).send({
                             status: 404,
                             message: "File not found."
                         });
