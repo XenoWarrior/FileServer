@@ -7,6 +7,15 @@ const constants = Object.freeze({
         DEBUG:   5,
         TRACE:   6,
         ALL:     7
+    },
+    LOG_LEVEL_STR: {
+        1: "FATAL",
+        2: "ERROR",
+        3: "WARN",
+        4: "INFO",
+        5: "DEBUG",
+        6: "TRACE",
+        7: "ALL"
     }
 });
 

@@ -136,7 +136,9 @@ class User extends RouteBase {
             sort: {
                 by: `${process.env.UPLOAD_TABLE_V1}.upload_date`,
                 mode: "DESC"
-            }
+            },
+            limit: 10,
+            offset: 0
         })
             .catch((error) => {
                 console.error(error);
