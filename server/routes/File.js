@@ -137,6 +137,14 @@ class FileGet extends RouteBase {
     async getFile(req, res) {
         let fileId = req.params.id;
 
+        if (fileId.includes("..") || fileId.includes("...") || fileId.includes("%2F") || fileId.includes("%5C")) {
+            res.status(404).send({
+                status: 404,
+                message: "File not found."
+            });
+            return;
+        }
+
         if (FileRegEx.exec(fileId)) {
             let fileData = database.select({
                 columns: "*",
