@@ -1,6 +1,10 @@
 # FileServer
 Simple file server for ShareX with web interface. This service also works with shortcuts iOS.
 
+# Supports
+* Upload via ShareX
+* Upload via iOS/iPadOS Shortcut (TODO: Share how-to)
+
 # Setup
 ## Download / Install
 Clone the respository using:
