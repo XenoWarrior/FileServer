@@ -46,6 +46,8 @@ app.use(`${process.env.API_V1}/server`, new Server().GetRoutes());
 app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
 app.use(`${process.env.API_V1}/user`, new User().GetRoutes());
 
+app.disable('x-powered-by');
+
 // Start App
 (async function () {
     app.use(router);
