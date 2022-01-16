@@ -165,7 +165,6 @@ class FileGet extends RouteBase {
                         res.status(404).send({
                             status: 404,
                             message: "File not found."
-                            e: e
                         });
                         return;
                     }
