@@ -64,11 +64,11 @@ class FileGet extends RouteBase {
                         console.log("Uploading:", filename);
 
                         let requestId = uuid();
-                        let fileExt = path.extname(filename);
+                        let fileExt = path.extname(filename.filename);
                         let newFilename = `${requestId}${fileExt}`;
                         let filePath = `${__dirname}/public/${newFilename}`;
                         let uploadUrl = `${(process.env.NODE_ENV === "production" ? "https" : `http`)}://${req.hostname}${(process.env.NODE_ENV === "production" ? "" : `:${process.env.APP_PORT}`)}${process.env.API_V1}/${requestId}`;
-                        let fileMime = mime.lookup(filename);
+                        let fileMime = mime.lookup(filename.filename);
 
                         let stream = fs.createWriteStream(filePath);
                         file.pipe(stream);
