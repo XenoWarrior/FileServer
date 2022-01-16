@@ -5,13 +5,15 @@
             "type": "node",
             "request": "launch",
             "name": "Server",
-            "program": "${workspaceFolder}/app.js"
+            "program": "${workspaceFolder}/app.js",
+            "outputCapture": "std",
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Client",
             "program": "${workspaceFolder}/node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+            "outputCapture": "std",
         }
     ],
     "compounds": [

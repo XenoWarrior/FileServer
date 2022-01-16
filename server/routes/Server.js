@@ -12,37 +12,44 @@ class Server extends RouteBase {
     }
 
     async getStats(req, res) {
-        let errors = []
-        let fileCount = await database.select("COUNT(id) as files", process.env.UPLOAD_TABLE_V1, {}, true)
+        let errors = [];
+        let fileCount = await database.select({
+            columns: "COUNT(id) as files",
+            from: process.env.UPLOAD_TABLE_V1,
+            options: {
+                singleItem: true
+            }
+        })
             .catch((error) => {
-                console.error(error);
-                error.push(error);
+                errors.push(error);
             });
-        let viewCount = await database.select("COUNT(id) as views", process.env.VIEW_TABLE_V1, {}, true)
+
+        let viewCount = await database.select({
+            columns: "COUNT(id) as views",
+            from: process.env.VIEW_TABLE_V1,
+            options: {
+                singleItem: true
+            }
+        })
             .catch((error) => {
-                console.error(error);
-                error.push(error);
+                errors.push(error);
             });
 
         if (errors.length === 0) {
-            res.set({ "Content-Type": "application/json" }).status(200)
-                .send({
-                    status: 200,
-                    data: {
-                        ...fileCount,
-                        ...viewCount,
-                        version: gitInfo.sha,
-                        branch: gitInfo.branch
-                    }
-                });
+            res.status(200).send({
+                status: 200,
+                data: {
+                    ...fileCount,
+                    ...viewCount,
+                    version: gitInfo.sha,
+                    branch: gitInfo.branch
+                }
+            });
         } else {
-            res.set({ "Content-Type": "application/json" }).status(500)
-                .send({
-                    status: 500,
-                    message: {
-                        errors: errors
-                    }
-                });
+            res.status(500).send({
+                status: 500,
+                message: "Internal server error"
+            });
         }
     }
 
@@ -50,7 +57,7 @@ class Server extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.get("/stats", this.isAuthenticated, this.getStats);
+            router.get("/stats", this.getStats);
 
             return router;
         })();

@@ -7,12 +7,9 @@ const DatabaseManager = require("../lib/database-manager");
 class RouteBase {
 
     constructor() {
-        // Database
         this.database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
-        // Passport
         this.passport = passport;
-
         this.passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => {
             await this.loginStrategy(u, p, d)
                 .catch((error) => {
@@ -24,12 +21,19 @@ class RouteBase {
     }
 
     async loginStrategy(username, password, done) {
-        let data = await this.database.select("id, user_name, user_email, user_pass", process.env.USER_TABLE_V1, { user_name: username }, true)
+        let data = await this.database.select({
+            columns: "id, user_name, user_email, user_pass",
+            from: process.env.USER_TABLE_V1,
+            where: { user_name: username },
+            options: {
+                singleItem: true
+            }
+        })
             .catch((error) => {
                 done(error);
             });
 
-        if (data.user_name === username) {
+        if (data && data.user_name === username) {
             let match = await bcrypt.compare(password, data.user_pass);
             if (match) {
                 done(null, {
@@ -38,7 +42,7 @@ class RouteBase {
                     email: data.user_email
                 });
             } else {
-                done(null, false, { message: "Invalid password" });
+                done(null, false, { message: "Invalid credentials" });
             }
         } else {
             done(null, false, { message: "Invalid credentials" });
@@ -57,11 +61,10 @@ class RouteBase {
     }
 
     notImplemented(req, res) {
-        res.set({ "Content-Type": "application/json" }).status(501)
-            .send({
-                status: 501,
-                message: `Not implemented.`
-            });
+        res.status(501).send({
+            status: 501,
+            message: `Not implemented.`
+        });
     }
 
     GetRoutes() {

@@ -9,7 +9,7 @@ const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, p
 const bcrypt = require('bcrypt');
 
 // UUID
-const { v4 : uuid } = require("uuid");
+const { v4: uuid } = require("uuid");
 
 class Authentication extends RouteBase {
     constructor() {
@@ -35,23 +35,41 @@ class Authentication extends RouteBase {
     }
 
     async checkDuplicates(request) {
-        let check = await database.select("user_name, user_email", process.env.USER_TABLE_V1, [
-            { user_name: request.username },
-            { user_email: request.email }
-        ], true);
+        return new Promise(async (resolve, reject) => {
+            let errors = [];
+            let check = await database.select({
+                columns: "user_name, user_email",
+                from: process.env.USER_TABLE_V1,
+                where: [
+                    { user_name: request.username },
+                    { user_email: request.email }
+                ],
+                options: {
+                    singleItem: true
+                }
+            })
+                .catch((error) => {
+                    reject(error);
+                    errors.push(error);
+                });
 
-        let conflicts = [];
-        if (check.hasOwnProperty("user_name") && check.user_name === request.username) {
-            conflicts.push("user_name");
-        }
-        if (check.hasOwnProperty("user_email") && check.user_email === request.email) {
-            conflicts.push("user_email");
-        }
+            if (errors.length > 0) {
+                reject(errors);
+            } else {
+                let conflicts = [];
+                if (check.hasOwnProperty("user_name") && check.user_name === request.username) {
+                    conflicts.push("user_name");
+                }
+                if (check.hasOwnProperty("user_email") && check.user_email === request.email) {
+                    conflicts.push("user_email");
+                }
 
-        return {
-            valid: (conflicts.length === 0),
-            data: conflicts
-        };
+                resolve({
+                    valid: (conflicts.length === 0),
+                    data: conflicts
+                });
+            }
+        });
     }
 
     async check(req, res) {
@@ -99,14 +117,15 @@ class Authentication extends RouteBase {
     async logout(req, res) {
         req.logout();
 
-        res.clearCookie('connect.sid', { path: '/' }).set({ "Content-Type": "application/json" }).status(200)
+        res.clearCookie('connect.sid', { path: '/' }).status(200)
             .send({
                 status: 200,
-                message: `Logged out.`
+                message: `Logged out`
             });
     }
 
     async register(req, res) {
+        let errors = [];
         let inputCheck = await this.validateInputs(req.body);
         if (!inputCheck.valid) {
             res.status(422).send({
@@ -117,7 +136,19 @@ class Authentication extends RouteBase {
             return;
         }
 
-        let duplicateCheck = await this.checkDuplicates(req.body);
+        let duplicateCheck = await this.checkDuplicates(req.body)
+            .catch((error) => {
+                errors.push(error);
+                res.status(500).send({
+                    status: 500,
+                    message: "Internal server error"
+                });
+            });
+
+        if (errors.length > 0) {
+            return;
+        }
+
         if (!duplicateCheck.valid) {
             res.status(409).send({
                 status: 409,
@@ -128,8 +159,8 @@ class Authentication extends RouteBase {
         }
 
         bcrypt.hash(req.body.password, 10)
-            .then((hash) => {
-                database.insert(process.env.USER_TABLE_V1, {
+            .then(async (hash) => {
+                await database.insert(process.env.USER_TABLE_V1, {
                     id: uuid(),
                     user_name: req.body.username,
                     user_pass: hash,
@@ -164,8 +195,7 @@ class Authentication extends RouteBase {
                     status: 500,
                     message: "Internal server error"
                 });
-                return;
-            })
+            });
     }
 
     GetRoutes() {
