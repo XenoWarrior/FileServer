@@ -87,7 +87,7 @@ class FileGet extends RouteBase {
                                 upload_path: filePath,
                                 upload_url: uploadUrl,
                                 upload_user: token.token_user,
-                                upload_filename: filename,
+                                upload_filename: filename.filename,
                                 upload_mime: fileMime,
                                 upload_date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss")
                             })
