@@ -6,7 +6,7 @@ const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, p
 const FileRegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs');
 const mime = require("mime-types");
 const { v4: uuid } = require("uuid");
 const moment = require("moment");
@@ -48,11 +48,11 @@ class FileGet extends RouteBase {
                     });
                 });
 
-            if (token.hasOwnProperty("token_user") && !token.token_revoked) {
+            if (token && token.hasOwnProperty("token_user") && !token.token_revoked) {
                 req.pipe(req.busboy);
 
                 req.busboy.on('field', function (fieldname, file, filename) {
-                    res.status(501).send({
+                    res.status(400).send({
                         status: 400,
                         message: `Bad request.`
                     });

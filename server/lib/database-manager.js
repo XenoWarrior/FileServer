@@ -21,7 +21,7 @@ class DatabaseManager {
      * @param {string} database | Database to use
      */
     constructor(hostname, username, password, database) {
-        logger.debug("DatabaseManager: Initialised")
+        logger.debug("DatabaseManager: Initialised", arguments)
         logger.trace();
 
         this.instance = uuid();

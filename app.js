@@ -1,10 +1,8 @@
 // Modules
 const path = require("path");
-const bodyParser = require('body-parser');
 const busboy = require('connect-busboy');
 const express = require("express");
 const session = require("express-session");
-const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const cors = require('cors');
 
@@ -30,14 +28,10 @@ app.use(cors());
 app.use(busboy());
 
 // Auth/Sessions
-app.use(cookieParser());
 app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Body Parser
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
 // Custom Routes
 // TODO: Dynamically register
